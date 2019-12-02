@@ -1,7 +1,3 @@
-! apt install tesseract-ocr
-! apt install libtesseract-dev
-! pip install pytesseract
-
 from glob import glob
 import os
 import cv2
