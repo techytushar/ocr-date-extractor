@@ -1,0 +1,9 @@
+flask-restful
+flask
+pytesseract
+numpy
+opencv-python
+matplotlib
+imutils
+scikit-image
+Pillow

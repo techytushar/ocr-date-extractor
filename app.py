@@ -10,16 +10,19 @@ api = Api(app)
 
 class SendB64Image(Resource):
     def post(self):
+        # Route to receive base64 encoded images 
         parse = reqparse.RequestParser()
         parse.add_argument('base_64_image_content', type=str)
         args = parse.parse_args()
         b64_img = args['base_64_image_content']
+        print(type(b64_img))
         with open('./static/uploaded_images/img.jpeg', 'wb') as f:
             f.write(b64decode(b64_img)) 
         return {"upload":"success"}
 
 class UploadImage(Resource):
     def post(self):
+        # Route to receive image files
         parse = reqparse.RequestParser()
         parse.add_argument('image', type=FileStorage, location='files')
         args = parse.parse_args()

@@ -1,4 +1,3 @@
-from glob import glob
 import os
 import cv2
 import numpy as np
@@ -108,12 +107,12 @@ def remove_noise_and_smooth(img):
   final_img = cv2.bitwise_or(smooth_img, thresh)
   return final_img
 
-
-img = imgs[327]
-img = rescale_image(img)
-img = np.array(img)
-thresh = threshold(img)
-cnts, bbox = find_bbox(thresh)
-img = crop_img(img, bbox)
-final_img = remove_noise_and_smooth(img)
-display_img(final_img, cmap='gray')
+if __name__ == "__main__":
+  img = imgs[327]
+  img = rescale_image(img)
+  img = np.array(img)
+  thresh = threshold(img)
+  cnts, bbox = find_bbox(thresh)
+  img = crop_img(img, bbox)
+  final_img = remove_noise_and_smooth(img)
+  display_img(final_img, cmap='gray')
