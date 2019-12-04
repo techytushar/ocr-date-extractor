@@ -14,10 +14,8 @@ def find_date(text):
     r"\s?\d{1,2}\s?[,']?\s?(19|20)?\d{2})|(\d{1,2}\s?[-/]?\s?"\
     r"(Jan|Feb|Mar|Apr|May|Jun|June|Jul|Aug|Sept|Sep|Oct|Nov|Dec)"\
     r"\s?[',-/]?\s?(19|20)?\d{1,2})"
-    print(text)
     pattern = re.compile(regex, flags=re.IGNORECASE)
     matches = list(re.finditer(pattern, text))
-    print(matches)
     if len(matches)==0:
         return None
     date = matches[0].group(0)
