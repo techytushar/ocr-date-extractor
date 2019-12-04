@@ -2,7 +2,7 @@ flask-restful
 flask
 pytesseract
 numpy
-opencv-python
+opencv-python-headless
 matplotlib
 imutils
 scikit-image
