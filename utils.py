@@ -7,7 +7,6 @@ from PIL import Image
 import random
 import imutils
 from skimage.filters import threshold_local
-import dateparser.search import search_dates
 
 
 def rescale_image(img):
@@ -21,6 +20,26 @@ def rescale_image(img):
   img = cv2.copyMakeBorder(img,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
   return img
 
+def auto_canny(img, sigma=0.50):
+  # compute the median of pixel intensities
+	med = np.median(img)
+	# apply Canny edge detection using computed median
+	lower = int(max(0, (1.0 - sigma) * med))
+	upper = int(min(255, (1.0 + sigma) * med))
+	edge_img = cv2.Canny(img, lower, upper)
+	# return the edged image
+	return edge_img
+
+def edged(img):
+  # find edges in image
+  # convert rgb to gray
+  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  # blur to remove noise
+  blur = cv2.GaussianBlur(gray, (5, 5), 0)
+  # find edges
+  edge_img = auto_canny(blur)
+  return edge_img
+
 def threshold(img):
   # threshold an image
   # convert rgb to gray
@@ -31,31 +50,20 @@ def threshold(img):
   blur = cv2.GaussianBlur(gray, (5, 5), 0)
   # apply thresholding
   thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
+  edge_img = edged(img)
+  thresh = cv2.bitwise_or(edge_img, thresh)
   return thresh
-
-def edged(img):
-  # find edges in image
-  # adding border
-  img = cv2.copyMakeBorder(img,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
-  # convert rgb to gray
-  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-  # blur to remove noise
-  blur = cv2.GaussianBlur(gray, (5, 5), 0)
-  # find edges
-  edged = cv2.Canny(blur, 5, 70)
-  return edged
 
 def find_bbox(thresh):
   # finds bounding box of receipt
   # finding contours
-  cnts = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-  cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+  cnts = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
   # sorting contours by area
   cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
   # finding min area rect for second biggest contour
   rect = cv2.minAreaRect(cnts[1])
   bbox = cv2.boxPoints(rect)
-  bbox = np.int0(box)
+  bbox = np.int0(bbox)
   return cnts, bbox
 
 def crop_img(img, bbox):

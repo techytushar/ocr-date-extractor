@@ -2,17 +2,26 @@ import pytesseract
 from PIL import Image
 import numpy as np
 import datetime
+import re
+from dateparser import parse
 
 from utils import rescale_image, threshold, crop_img, find_bbox, remove_noise_and_smooth
 
 
 def find_date(text):
-  regex = r"((19|20)?\d{1,2}\s?[-/]\s?\d{1,2}\s?[-/]\s?(19|20)?\d{2})|((Jan|Feb|Mar|Apr|May|Jun|June|Jul|Aug|Sept|Sep|Oct|Nov|Dec)\s?\d{1,2}\s?[,']\s?(19|20)?\d{2})"
-  
-  pattern = re.compile(regex)
-  matches = re.findall(patter, text, flags=r.IGNORECASE)
-  dates = search_dates(text, languages=['en'])
-  return dates
+    regex = r"((19|20)?\d{1,2}\s?[-/]\s?\d{1,2}\s?[-/]\s?(19|20)?\d{2})|"\
+    r"((Jan|Feb|Mar|Apr|May|Jun|June|Jul|Aug|Sept|Sep|Oct|Nov|Dec)"\
+    r"\s?\d{1,2}\s?[,']?\s?(19|20)?\d{2})|(\d{1,2}\s?[-/]?\s?"\
+    r"(Jan|Feb|Mar|Apr|May|Jun|June|Jul|Aug|Sept|Sep|Oct|Nov|Dec)"\
+    r"\s?[',-/]?\s?(19|20)?\d{1,2})"
+    print(text)
+    pattern = re.compile(regex, flags=re.IGNORECASE)
+    matches = list(re.finditer(pattern, text))
+    print(matches)
+    if len(matches)==0:
+        return None
+    date = matches[0].group(0)
+    return parse(date)
 
 def pipeline(img_name):
     path = f'./static/uploaded_images/{img_name}.jpeg'
@@ -32,5 +41,4 @@ def pipeline(img_name):
     date = find_date(text)
     if date is None:
         return date
-    date = date[0][1].strftime("%Y-%m-%d")
-    return date
+    return date.strftime("%Y-%m-%d")

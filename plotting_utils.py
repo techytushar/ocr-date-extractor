@@ -1,5 +1,7 @@
 # Contains plotting functions for Jupyter Notebook
 
+import matplotlib.pyplot as plt
+
 def display_img(img, cmap=None):
   # function to display images using plt
   plt.figure(figsize=(8,8))
