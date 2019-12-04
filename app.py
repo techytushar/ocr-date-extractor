@@ -46,9 +46,9 @@ class UploadImage(Resource):
             return {"Error": "Only bytes data of Base64 encoded image accepted"}, 415
         return {"date": date}
 
-
-path = './static/uploaded_images'
-if not os.path.exists(path):
-    os.makedirs(path)
-api.add_resource(SendB64Image, '/extract_date')
-api.add_resource(UploadImage, '/extract_date_from_image')
+if __name__ == "app":
+    path = './static/uploaded_images'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    api.add_resource(SendB64Image, '/extract_date')
+    api.add_resource(UploadImage, '/extract_date_from_image')
