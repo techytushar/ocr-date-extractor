@@ -11,6 +11,10 @@ from utils import random_string
 app = Flask(__name__)
 api = Api(app)
 
+@app.route('/')
+def index():
+    return "Go to https://github.com/techytushar/ocr-date-extractor for more information"
+
 class SendB64Image(Resource):
     def post(self):
         # Route to receive base64 encoded images 
