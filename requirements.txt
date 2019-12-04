@@ -8,3 +8,4 @@ imutils
 scikit-image
 Pillow
 dateparser
+gunicorn
