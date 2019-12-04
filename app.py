@@ -2,7 +2,10 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from base64 import b64decode
 from werkzeug.datastructures import FileStorage
-from extract_date import find_date
+import os
+
+from extract_date import pipeline
+from utils import random_string
 
 
 app = Flask(__name__)
@@ -15,10 +18,14 @@ class SendB64Image(Resource):
         parse.add_argument('base_64_image_content', type=str)
         args = parse.parse_args()
         b64_img = args['base_64_image_content']
-        print(type(b64_img))
-        with open('./static/uploaded_images/img.jpeg', 'wb') as f:
-            f.write(b64decode(b64_img)) 
-        return {"upload":"success"}
+        file_name = random_string()
+        with open(f'./static/uploaded_images/{file_name}.jpeg', 'wb') as f:
+            f.write(b64decode(b64_img))
+        date = pipeline(file_name)
+        os.remove(f'./static/uploaded_images/{file_name}.jpeg')
+        if date is ValueError:
+            return {"Error": "Only bytes data of Base64 encoded image accepted"}, 415
+        return {"date": date}
 
 class UploadImage(Resource):
     def post(self):
@@ -27,7 +34,13 @@ class UploadImage(Resource):
         parse.add_argument('image', type=FileStorage, location='files')
         args = parse.parse_args()
         img = args['image']
-        img.save("./static/uploaded_images/img.jpg")
+        file_name = random_string()
+        img.save(f"./static/uploaded_images/{file_name}.jpeg")
+        date = pipeline(file_name)
+        os.remove(f'./static/uploaded_images/{file_name}.jpeg')
+        if date is ValueError:
+            return {"Error": "Only bytes data of Base64 encoded image accepted"}, 415
+        return {"date": date}
 
 api.add_resource(SendB64Image, '/extract_date')
 api.add_resource(UploadImage, '/extract_date_from_image')

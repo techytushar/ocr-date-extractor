@@ -1,19 +1,14 @@
 import os
+import re
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import random
 import imutils
-import pytesseract
 from skimage.filters import threshold_local
+import dateparser.search import search_dates
 
-
-def display_img(img, cmap=None):
-  # function to display images using plt
-  plt.figure(figsize=(8,8))
-  plt.imshow(img, cmap=cmap)
-  print(img.size)
 
 def rescale_image(img):
   # rescales the very large images
@@ -21,12 +16,13 @@ def rescale_image(img):
   factor = min(1, float(1024.0 / height))
   size = int(factor * height), int(factor * width)
   img = img.resize(size, Image.ANTIALIAS)
+  img = np.array(img)
+  # adding border to image
+  img = cv2.copyMakeBorder(img,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
   return img
 
 def threshold(img):
   # threshold an image
-  # adding border to image
-  img = cv2.copyMakeBorder(img,10,10,10,10,cv2.BORDER_CONSTANT,value=[0,0,0])
   # convert rgb to gray
   gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
   # invert image
@@ -49,13 +45,6 @@ def edged(img):
   edged = cv2.Canny(blur, 5, 70)
   return edged
 
-def crop_img(img, bbox):
-  # crop the image using receipt bounding box
-  left, top = bbox[bbox.sum(axis=1).argmin()]
-  right, bottom = bbox[bbox.sum(axis=1).argmax()]
-  img = img[top:bottom,left:right]
-  return img
-
 def find_bbox(thresh):
   # finds bounding box of receipt
   # finding contours
@@ -69,22 +58,12 @@ def find_bbox(thresh):
   bbox = np.int0(box)
   return cnts, bbox
 
-def plot_random():
-  #plotting random images with bounding boxes
-  fig, axs = plt.subplots(3, 3, figsize=(15,15))
-  for row in range(3):
-    for col in range(3):
-      idx = random.randint(0,594)
-      img = imgs[idx]
-      img = rescale_image(img)
-      img = np.array(img)
-      thresh = threshold(img)
-      cnts, bbox = find_bbox(thresh)
-      temp_img = img.copy()
-      cv2.drawContours(temp_img,[bbox],0,(0,0,255),4)
-      axs[row,col].set_title(f'{idx}')
-      axs[row,col].imshow(temp_img)
-  plt.show()
+def crop_img(img, bbox):
+  # crop the image using receipt bounding box
+  left, top = bbox[bbox.sum(axis=1).argmin()]
+  right, bottom = bbox[bbox.sum(axis=1).argmax()]
+  img = img[top:bottom,left:right]
+  return img
 
 def image_smoothening(img):
   # thresholding with less noise 
@@ -107,12 +86,5 @@ def remove_noise_and_smooth(img):
   final_img = cv2.bitwise_or(smooth_img, thresh)
   return final_img
 
-if __name__ == "__main__":
-  img = imgs[327]
-  img = rescale_image(img)
-  img = np.array(img)
-  thresh = threshold(img)
-  cnts, bbox = find_bbox(thresh)
-  img = crop_img(img, bbox)
-  final_img = remove_noise_and_smooth(img)
-  display_img(final_img, cmap='gray')
+def random_string():
+  return ''.join([chr(random.randint(97,122)) for i in range(10)])

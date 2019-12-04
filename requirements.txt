@@ -7,3 +7,4 @@ matplotlib
 imutils
 scikit-image
 Pillow
+dateparser
