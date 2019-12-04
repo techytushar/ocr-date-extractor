@@ -4,7 +4,6 @@ pytesseract
 numpy
 opencv-python-headless
 matplotlib
-imutils
 scikit-image
 Pillow
 dateparser
