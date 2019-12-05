@@ -6,7 +6,7 @@ Flask API to extract dates from documents
 
 The API is provided with 2 routes:
 
-* If you want to pass Base64 encoded image, send a POST request with payload `{“base_64_image”: <base_64_image_bytes>}` to
+* If you want to pass Base64 encoded image, send a POST request with payload `{"base_64_image_content": <base_64_image_bytes>}` to
 
 ```
 https://ocr-date-extractor.herokuapp.com/extract_date
@@ -16,6 +16,17 @@ https://ocr-date-extractor.herokuapp.com/extract_date
 
 ```
 https://ocr-date-extractor.herokuapp.com/extract_date_from_image
+```
+
+Python sample code to test out the API:
+
+```python
+import requests, base64
+img_url = <path_to_image>
+with open(img_url, 'rb') as f:
+    img = base64.b64encode(f.read())
+response = requests.post('https://ocr-date-extractor.herokuapp.com/extract_date', data={'base_64_image_content':img})
+print(response.content)
 ```
 
 ## Working
