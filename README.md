@@ -20,6 +20,8 @@ https://ocr-date-extractor.herokuapp.com/extract_date_from_image
 
 Python sample code to test out the API:
 
+1. Sending the image as Base64 encoded
+
 ```python
 import requests, base64
 img_url = <path_to_image>
@@ -27,6 +29,18 @@ with open(img_url, 'rb') as f:
     img = base64.b64encode(f.read())
 response = requests.post('https://ocr-date-extractor.herokuapp.com/extract_date', data={'base_64_image_content':img})
 print(response.content)
+```
+
+2. Directly uploading the file
+
+```python
+import requests
+url = "https://ocr-date-extractor.herokuapp.com/extract_date_from_image"
+files=[
+  ('image',('document.png',open('/Users/tushar/peak/document.png','rb'),'image/png'))
+]
+response = requests.post(url, data=payload, files=files)
+print(response.text)
 ```
 
 ## Working
